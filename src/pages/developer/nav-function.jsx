@@ -31,6 +31,10 @@ export const navList = [
     submenu: "",
     subNavList: [
       {
+        label: "Department",
+        path: `${devNavUrl}/${urlDeveloper}/settings/department`,
+      },
+      {
         label: "Roles",
         path: `${devNavUrl}/${urlDeveloper}/settings/roles`,
       },

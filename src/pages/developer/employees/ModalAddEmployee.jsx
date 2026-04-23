@@ -13,11 +13,11 @@ import {
 import ModalWrapperSide from "../../../partials/modals/ModalWrapperSide";
 import { FaTimes } from "react-icons/fa";
 import { Formik, Form } from "formik";
-import { InputText } from "../../../components/form-inputs/FormInputs";
+import { InputSelect, InputText } from "../../../components/form-inputs/FormInputs";
 import ButtonSpinner from "../../../partials/spinners/ButtonSpinner";
 import MessageError from "../../../partials/MessageError";
 
-const ModalAddEmployee = ({ itemEdit }) => {
+const ModalAddEmployee = ({ itemEdit, activeDepartments = [] }) => {
   const { store, dispatch } = React.useContext(StoreContext);
   const queryClient = useQueryClient();
 
@@ -47,20 +47,20 @@ const ModalAddEmployee = ({ itemEdit }) => {
   });
 
   const initVal = {
-    ...itemEdit,
-    employee_first_name: itemEdit ? itemEdit.employee_first_name : "",
-    employee_middle_name: itemEdit ? itemEdit.employee_middle_name : "",
-    employee_last_name: itemEdit ? itemEdit.employee_last_name : "",
-    employee_email: itemEdit ? itemEdit.employee_email : "",
-    employee_first_name_old: itemEdit ? itemEdit.employee_first_name : "",
-    employee_email_old: itemEdit ? itemEdit.employee_email : "",
+    employee_first_name:    itemEdit ? itemEdit.employee_first_name : "",
+    employee_middle_name:   itemEdit ? itemEdit.employee_middle_name : "",
+    employee_last_name:     itemEdit ? itemEdit.employee_last_name : "",
+    employee_email:         itemEdit ? itemEdit.employee_email : "",
+    employee_department_id: itemEdit ? itemEdit.employee_department_id : "",
+    employee_email_old:     itemEdit ? itemEdit.employee_email : "",
   };
 
   const yupSchema = Yup.object({
-    employee_first_name: Yup.string().trim().required("required"),
-    employee_middle_name: Yup.string().trim(),
-    employee_last_name: Yup.string().trim().required("required"),
-    employee_email: Yup.string().trim().email("Invalid email").required("required"),
+    employee_first_name:    Yup.string().trim().required("Required"),
+    employee_middle_name:   Yup.string().trim(),
+    employee_last_name:     Yup.string().trim().required("Required"),
+    employee_email:         Yup.string().trim().email("Invalid email").required("Required"),
+    employee_department_id: Yup.string().trim().required("Required"),
   });
 
   const handleClose = () => {
@@ -72,11 +72,8 @@ const ModalAddEmployee = ({ itemEdit }) => {
   }, [dispatch]);
 
   return (
-    <ModalWrapperSide
-      handleClose={handleClose}
-      className="transition-all ease-in-out transform duration-200"
-    >
-      <div className="moda-header relative mb-4">
+    <ModalWrapperSide handleClose={handleClose}>
+      <div className="modal-header relative mb-4">
         <h3 className="text-dark text-sm">
           {itemEdit ? "Update" : "Add"} Employee
         </h3>
@@ -134,6 +131,20 @@ const ModalAddEmployee = ({ itemEdit }) => {
                       type="email"
                       disabled={mutation.isPending}
                     />
+                  </div>
+                  <div className="relative mb-6">
+                    <InputSelect
+                      label="Department"
+                      name="employee_department_id"
+                      disabled={mutation.isPending}
+                    >
+                      <option value="" hidden>-- Select Department --</option>
+                      {activeDepartments.map((item, key) => (
+                        <option key={key} value={item.department_aid}>
+                          {item.department_name}
+                        </option>
+                      ))}
+                    </InputSelect>
                   </div>
                   {store.error && <MessageError />}
                 </div>
