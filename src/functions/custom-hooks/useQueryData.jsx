@@ -15,6 +15,7 @@ const useQueryData = (
     queryFn: async () => await queryData(endpoint, method, fd),
     retry: false,
     refetchOnWindowFocus: refetchOnWindowFocus,
+    staleTime: 0,
     cacheTime: 200,
   });
 };

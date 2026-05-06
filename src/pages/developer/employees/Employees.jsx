@@ -58,7 +58,7 @@ const Employees = () => {
       {store.isAdd && (
         <ModalAddEmployee
           itemEdit={itemEdit}
-          activeDepartments={activeDepartments}
+          filterArrayActiveDepartments={activeDepartments || []}
         />
       )}
     </>
