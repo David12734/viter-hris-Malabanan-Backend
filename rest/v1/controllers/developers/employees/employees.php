@@ -20,8 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 //READ / GET
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    $result = require 'read.php';
-    sendResponse($result);
+    $conn = null;
+    $conn = checkDBConnection();
+    $val = new Employees($conn);
+    $val->employee_is_active = "";
+    $val->search = "";
+    $query = checkReadAll($val);
+    http_response_code(200);
+    getQueriedData($query);
     exit;
 }
 

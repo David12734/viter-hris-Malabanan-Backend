@@ -21,6 +21,7 @@ if (array_key_exists("id", $_GET)) {
     isDepartmentExist($val);
 
     $query = checkUpdate($val);
+    $val->syncSupervisorSnapshot();
     http_response_code(200);
     returnSuccess($val, "Employees Update", $query);
 }

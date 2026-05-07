@@ -30,7 +30,10 @@ const ModalRestore = ({
     mutationFn: (values) => queryData(mysqlApiRestore, "put", values),
     onSuccess: (data) => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      const queryKeys = Array.isArray(queryKey) ? queryKey : [queryKey];
+      queryKeys.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: [key] }),
+      );
 
       if (data.success) {
         dispatch(setIsRestore(false));

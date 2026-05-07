@@ -34,7 +34,10 @@ const ModalDelete = ({
     mutationFn: (values) => queryData(mysqlApiDelete, "delete", values),
     onSuccess: (data) => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      const queryKeys = Array.isArray(queryKey) ? queryKey : [queryKey];
+      queryKeys.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: [key] }),
+      );
       if (data.success) {
         dispatch(setSuccess(true));
         dispatch(setMessage(successMsg));

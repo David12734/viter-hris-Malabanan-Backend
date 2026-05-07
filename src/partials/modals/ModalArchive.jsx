@@ -28,7 +28,10 @@ const ModalArchive = ({
     mutationFn: (values) => queryData(mysqlApiArchive, "put", values),
     onSuccess: (data) => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      const queryKeys = Array.isArray(queryKey) ? queryKey : [queryKey];
+      queryKeys.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: [key] }),
+      );
 
       if (data.success) {
         dispatch(setIsArchive(false));

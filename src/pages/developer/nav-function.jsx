@@ -35,6 +35,10 @@ export const navList = [
         path: `${devNavUrl}/${urlDeveloper}/settings/department`,
       },
       {
+        label: "Direct Report",
+        path: `${devNavUrl}/${urlDeveloper}/settings/direct-report`,
+      },
+      {
         label: "Roles",
         path: `${devNavUrl}/${urlDeveloper}/settings/roles`,
       },

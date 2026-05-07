@@ -11,6 +11,10 @@ class Employees
     public $employee_department_id;
     public $employee_birthday;
     public $employee_start_work_date;
+    public $employee_supervisor_id;
+    public $employee_supervisor_first_name;
+    public $employee_supervisor_last_name;
+    public $employee_supervisor_email;
     public $employee_created;
     public $employee_updated;
 
@@ -29,6 +33,35 @@ class Employees
         $this->connection = $db;
         $this->tblEmployees = "employees";
         $this->tblSettingsDepartment = "settings_department";
+        $this->ensureSupervisorColumns();
+    }
+
+    private function ensureSupervisorColumns()
+    {
+        $columns = [
+            "employee_supervisor_id" => "int(11) null",
+            "employee_supervisor_first_name" => "varchar(128) not null default ''",
+            "employee_supervisor_last_name" => "varchar(128) not null default ''",
+            "employee_supervisor_email" => "varchar(255) not null default ''",
+        ];
+
+        foreach ($columns as $column => $definition) {
+            $query = $this->connection->prepare("
+                select count(*) as total
+                from information_schema.columns
+                where table_schema = database()
+                    and table_name = :table_name
+                    and column_name = :column_name
+            ");
+            $query->execute([
+                "table_name" => $this->tblEmployees,
+                "column_name" => $column,
+            ]);
+            $row = $query->fetch();
+            if ((int)$row["total"] === 0) {
+                $this->connection->exec("alter table {$this->tblEmployees} add {$column} {$definition}");
+            }
+        }
     }
 
     public function create()
@@ -147,6 +180,78 @@ class Employees
                 "employee_start_work_date" => $this->employee_start_work_date,
                 "employee_updated"         => $this->employee_updated,
                 "employee_aid"             => $this->employee_aid,
+            ]);
+        } catch (PDOException $e) {
+            returnError($e->getMessage());
+            $query = false;
+        }
+        return $query;
+    }
+
+    public function updateSupervisor()
+    {
+        try {
+            $sql  = "update {$this->tblEmployees} set ";
+            $sql .= "employee_supervisor_id = :employee_supervisor_id, ";
+            $sql .= "employee_supervisor_first_name = :employee_supervisor_first_name, ";
+            $sql .= "employee_supervisor_last_name = :employee_supervisor_last_name, ";
+            $sql .= "employee_supervisor_email = :employee_supervisor_email, ";
+            $sql .= "employee_updated = :employee_updated ";
+            $sql .= "where employee_aid = :employee_aid ";
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                "employee_supervisor_id" => $this->employee_supervisor_id,
+                "employee_supervisor_first_name" => $this->employee_supervisor_first_name,
+                "employee_supervisor_last_name" => $this->employee_supervisor_last_name,
+                "employee_supervisor_email" => $this->employee_supervisor_email,
+                "employee_updated" => $this->employee_updated,
+                "employee_aid" => $this->employee_aid,
+            ]);
+        } catch (PDOException $e) {
+            returnError($e->getMessage());
+            $query = false;
+        }
+        return $query;
+    }
+
+    public function clearSupervisor()
+    {
+        try {
+            $sql  = "update {$this->tblEmployees} set ";
+            $sql .= "employee_supervisor_id = null, ";
+            $sql .= "employee_supervisor_first_name = '', ";
+            $sql .= "employee_supervisor_last_name = '', ";
+            $sql .= "employee_supervisor_email = '', ";
+            $sql .= "employee_updated = :employee_updated ";
+            $sql .= "where employee_aid = :employee_aid ";
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                "employee_updated" => $this->employee_updated,
+                "employee_aid" => $this->employee_aid,
+            ]);
+        } catch (PDOException $e) {
+            returnError($e->getMessage());
+            $query = false;
+        }
+        return $query;
+    }
+
+    public function syncSupervisorSnapshot()
+    {
+        try {
+            $sql  = "update {$this->tblEmployees} set ";
+            $sql .= "employee_supervisor_first_name = :employee_supervisor_first_name, ";
+            $sql .= "employee_supervisor_last_name = :employee_supervisor_last_name, ";
+            $sql .= "employee_supervisor_email = :employee_supervisor_email, ";
+            $sql .= "employee_updated = :employee_updated ";
+            $sql .= "where employee_supervisor_id = :employee_supervisor_id ";
+            $query = $this->connection->prepare($sql);
+            $query->execute([
+                "employee_supervisor_first_name" => $this->employee_first_name,
+                "employee_supervisor_last_name" => $this->employee_last_name,
+                "employee_supervisor_email" => $this->employee_email,
+                "employee_updated" => $this->employee_updated,
+                "employee_supervisor_id" => $this->employee_aid,
             ]);
         } catch (PDOException $e) {
             returnError($e->getMessage());
